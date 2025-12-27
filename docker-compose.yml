@@ -1,0 +1,20 @@
+services:
+  bab-proxy:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - BAB_API_KEY=${BAB_API_KEY:-}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+      - MAX_RESPONSE_SIZE_MB=${MAX_RESPONSE_SIZE_MB:-10}
+      - MAX_HTML_SIZE_MB=${MAX_HTML_SIZE_MB:-5}
+      - DEFAULT_TIMEOUT_MS=${DEFAULT_TIMEOUT_MS:-10000}
+      - MAX_TIMEOUT_MS=${MAX_TIMEOUT_MS:-30000}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
