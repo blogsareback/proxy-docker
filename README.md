@@ -157,10 +157,6 @@ For production, run the proxy behind a reverse proxy (nginx, Caddy, Traefik) wit
 
 ## Deploy to Cloud
 
-### Railway
-
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bab-proxy)
-
 ### Fly.io
 
 ```bash
@@ -285,7 +281,3 @@ npm start
 ```bash
 npm run typecheck
 ```
-
-## License
-
-MIT
