@@ -187,6 +187,76 @@ docker run -d \
   blogsareback/bab-proxy
 ```
 
+## Exposing Your Proxy
+
+If you're running the proxy on a home server, NAS, or local machine, you'll need to expose it to the internet so Blogs Are Back can reach it. Here are several options:
+
+### Cloudflare Tunnel (Recommended)
+
+Free, secure, and production-ready. No need to open ports on your router.
+
+1. [Create a Cloudflare account](https://dash.cloudflare.com/sign-up) and add a domain
+2. Install cloudflared:
+   ```bash
+   # macOS
+   brew install cloudflared
+
+   # Linux
+   curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+   chmod +x cloudflared
+   sudo mv cloudflared /usr/local/bin/
+   ```
+3. Authenticate:
+   ```bash
+   cloudflared tunnel login
+   ```
+4. Create and run the tunnel:
+   ```bash
+   cloudflared tunnel create bab-proxy
+   cloudflared tunnel route dns bab-proxy proxy.yourdomain.com
+   cloudflared tunnel run --url http://localhost:3000 bab-proxy
+   ```
+
+Your proxy will be available at `https://proxy.yourdomain.com`.
+
+For a persistent setup, [create a config file](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/local-management/as-a-service/) and run cloudflared as a service.
+
+### Tailscale Funnel
+
+If you already use Tailscale, Funnel is the easiest option.
+
+1. [Enable Funnel](https://tailscale.com/kb/1223/funnel) in your Tailscale admin console
+2. Serve your proxy:
+   ```bash
+   tailscale funnel 3000
+   ```
+
+Your proxy will be available at `https://your-machine-name.tailnet-name.ts.net`.
+
+### ngrok
+
+Great for quick testing. Free tier has limitations (random URLs, session limits).
+
+1. [Sign up for ngrok](https://ngrok.com/) and install it
+2. Add your auth token:
+   ```bash
+   ngrok config add-authtoken YOUR_TOKEN
+   ```
+3. Start the tunnel:
+   ```bash
+   ngrok http 3000
+   ```
+
+Copy the forwarding URL (e.g., `https://abc123.ngrok.io`) to use in BAB.
+
+For a stable URL, upgrade to a paid plan or use a custom domain.
+
+### Other Options
+
+- **[localtunnel](https://localtunnel.github.io/www/)** - Simple, no signup: `npx localtunnel --port 3000`
+- **[bore](https://github.com/ekzhang/bore)** - Minimal, self-hostable: `bore local 3000 --to bore.pub`
+- **Reverse proxy on VPS** - Run nginx/Caddy on a cheap VPS and tunnel to it via SSH or WireGuard
+
 ## Development
 
 ### Prerequisites
